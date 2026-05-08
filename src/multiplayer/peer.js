@@ -1,27 +1,45 @@
 import { Peer } from 'peerjs'
 import { MSG, ROOM_PREFIX, generateRoomCode } from './messages.js'
 
+const PEER_OPTS = {
+  debug: 2,
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun.cloudflare.com:3478' },
+      { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+    ],
+  },
+}
+
 function openPeer(id) {
   return new Promise((resolve, reject) => {
-    const peer = id ? new Peer(id) : new Peer()
+    const peer = id ? new Peer(id, PEER_OPTS) : new Peer(PEER_OPTS)
+    console.log('[peer] opening peer with id:', id || '(auto)')
     let done = false
     const timer = setTimeout(() => {
       if (!done) {
         done = true
+        console.warn('[peer] open timeout after 15s')
         try { peer.destroy() } catch {}
         reject(new Error('Verbindung zum Signalisierungs-Server fehlgeschlagen (Timeout)'))
       }
-    }, 12000)
-    peer.once('open', () => {
+    }, 15000)
+    peer.once('open', (gotId) => {
       if (done) return
       done = true
       clearTimeout(timer)
+      console.log('[peer] open ok, id =', gotId)
       resolve(peer)
     })
     peer.once('error', (err) => {
       if (done) return
       done = true
       clearTimeout(timer)
+      console.error('[peer] open error:', err?.type, err?.message)
       try { peer.destroy() } catch {}
       reject(err)
     })
@@ -70,27 +88,37 @@ export async function createHost() {
       }
 
       peer.on('connection', (conn) => {
+        console.log('[host] incoming connection from', conn.peer)
         conn.on('open', () => {
+          console.log('[host] connection open from', conn.peer)
           connections.set(conn.peer, conn)
         })
         conn.on('data', (data) => {
           if (!data || typeof data !== 'object') return
           if (data.type === MSG.HELLO) {
+            console.log('[host] hello from', conn.peer, 'name=', data.name)
             ctrl.onPlayerJoin?.(conn.peer, String(data.name || 'Spieler').slice(0, 20))
           } else if (data.type === MSG.ACTION) {
             ctrl.onAction?.(conn.peer, data.action)
           }
         })
         conn.on('close', () => {
+          console.log('[host] connection closed from', conn.peer)
           connections.delete(conn.peer)
           ctrl.onPlayerLeave?.(conn.peer)
         })
-        conn.on('error', () => {
+        conn.on('error', (e) => {
+          console.error('[host] conn error from', conn.peer, e)
           connections.delete(conn.peer)
           ctrl.onPlayerLeave?.(conn.peer)
         })
       })
 
+      peer.on('error', (err) => {
+        console.error('[host] peer error:', err?.type, err?.message)
+      })
+
+      console.log('[host] ready, code =', code)
       return ctrl
     } catch (err) {
       lastErr = err
@@ -111,13 +139,15 @@ export async function joinHost({ code, name }) {
 
   return new Promise((resolve, reject) => {
     let opened = false
+    console.log('[client] connecting to host id:', hostId)
     const conn = peer.connect(hostId, { reliable: true })
     const timer = setTimeout(() => {
       if (!opened) {
+        console.warn('[client] connect timeout after 18s')
         try { peer.destroy() } catch {}
-        reject(new Error('Verbindung fehlgeschlagen — Code prüfen?'))
+        reject(new Error('Verbindung fehlgeschlagen — Code prüfen oder Host-Tab im Vordergrund halten?'))
       }
-    }, 12000)
+    }, 18000)
 
     const ctrl = {
       peerId: peer.id,
@@ -131,6 +161,7 @@ export async function joinHost({ code, name }) {
     }
 
     conn.on('open', () => {
+      console.log('[client] data channel open')
       opened = true
       clearTimeout(timer)
       conn.send({ type: MSG.HELLO, name: String(name || 'Spieler').slice(0, 20) })
@@ -143,23 +174,26 @@ export async function joinHost({ code, name }) {
     })
 
     conn.on('close', () => {
+      console.log('[client] connection closed')
       ctrl.onClose?.('closed')
       try { peer.destroy() } catch {}
     })
 
     conn.on('error', (err) => {
+      console.error('[client] conn error:', err?.type, err?.message)
       if (!opened) {
         clearTimeout(timer)
         try { peer.destroy() } catch {}
-        reject(err)
+        reject(new Error(err?.message || 'Verbindung zum Host fehlgeschlagen'))
       }
     })
 
     peer.on('error', (err) => {
+      console.error('[client] peer error:', err?.type, err?.message)
       if (!opened) {
         clearTimeout(timer)
         try { peer.destroy() } catch {}
-        reject(err)
+        reject(new Error(err?.message || 'Peer-Fehler'))
       }
     })
   })
