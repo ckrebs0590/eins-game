@@ -1,0 +1,41 @@
+:root {
+  --color-red: #d72638;
+  --color-yellow: #f4c20d;
+  --color-green: #1ea84a;
+  --color-blue: #1f6feb;
+  --color-wild-1: #222;
+  --color-wild-2: #444;
+  --table-green: #0e6e3a;
+  --table-green-dark: #0a5b30;
+  --card-back: #1a1a1a;
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  --radius-card: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(ellipse at center, var(--table-green) 0%, var(--table-green-dark) 100%);
+  color: white;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

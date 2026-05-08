@@ -1,0 +1,140 @@
+.card {
+  position: relative;
+  width: 80px;
+  height: 120px;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.card.large {
+  width: 100px;
+  height: 150px;
+}
+
+.card.small {
+  width: 50px;
+  height: 75px;
+}
+
+.card-inner {
+  position: absolute;
+  inset: 6px;
+  background: white;
+  border-radius: 8px;
+  transform: rotate(-12deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card.color-red { background: var(--color-red); }
+.card.color-yellow { background: var(--color-yellow); }
+.card.color-green { background: var(--color-green); }
+.card.color-blue { background: var(--color-blue); }
+.card.color-wild { background: linear-gradient(135deg, #1c1c1c, #3a3a3a); }
+
+.card .corner {
+  position: absolute;
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1;
+}
+.card.large .corner { font-size: 22px; }
+.card.small .corner { font-size: 12px; }
+
+.card .corner.tl { top: 6px; left: 8px; }
+.card .corner.br { bottom: 6px; right: 8px; transform: rotate(180deg); }
+
+.card .center-value {
+  font-weight: 900;
+  font-size: 48px;
+  line-height: 1;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.18);
+}
+.card.large .center-value { font-size: 60px; }
+.card.small .center-value { font-size: 28px; }
+
+.card.color-red .corner { color: var(--color-red); }
+.card.color-yellow .corner { color: #b88a04; }
+.card.color-green .corner { color: var(--color-green); }
+.card.color-blue .corner { color: var(--color-blue); }
+.card.color-wild .corner { color: white; }
+
+.card.color-red .center-value { color: var(--color-red); }
+.card.color-yellow .center-value { color: #b88a04; }
+.card.color-green .center-value { color: var(--color-green); }
+.card.color-blue .center-value { color: var(--color-blue); }
+.card.color-wild .center-value { color: white; font-size: 32px; }
+.card.color-wild.large .center-value { font-size: 40px; }
+
+.card.wild-circle {
+  background: conic-gradient(
+    var(--color-red) 0% 25%,
+    var(--color-yellow) 25% 50%,
+    var(--color-green) 50% 75%,
+    var(--color-blue) 75% 100%
+  );
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0.85;
+}
+
+.card.color-wild .center-value {
+  position: relative;
+  z-index: 1;
+}
+
+.card.back {
+  background: linear-gradient(135deg, #2a0a0a 0%, #4a1010 50%, #2a0a0a 100%);
+  cursor: pointer;
+}
+
+.card.back .card-inner {
+  background: var(--color-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card.back .logo {
+  color: white;
+  font-weight: 900;
+  font-size: 28px;
+  font-style: italic;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  transform: rotate(0deg);
+}
+
+.card.playable {
+  cursor: pointer;
+}
+
+.card.playable:hover {
+  transform: translateY(-12px) scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.card.not-playable {
+  filter: brightness(0.6) saturate(0.6);
+}
+
+.card .symbol {
+  font-size: 40px;
+  font-weight: 900;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+.card.large .symbol { font-size: 52px; }
+.card.small .symbol { font-size: 22px; }

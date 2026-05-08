@@ -1,0 +1,123 @@
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
+}
+
+@keyframes flyIn {
+  0% { transform: translate(var(--from-x, 0), var(--from-y, -200px)) rotate(-15deg) scale(0.6); opacity: 0; }
+  100% { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; }
+}
+
+@keyframes flyToDiscard {
+  0% { transform: translate(0, 0) rotate(0) scale(1); }
+  100% { transform: translate(var(--to-x), var(--to-y)) rotate(var(--rotate, 8deg)) scale(0.95); opacity: 0; }
+}
+
+@keyframes drawAnim {
+  0% { transform: translate(var(--from-x, 0), var(--from-y, 0)) rotate(0) scale(0.8); opacity: 0; }
+  100% { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; }
+}
+
+@keyframes pop {
+  0% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+@keyframes turnRing {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5); }
+  50% { box-shadow: 0 0 0 4px rgba(255, 255, 0, 0.7); }
+}
+
+@keyframes confettiBurst {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  100% { transform: translate(var(--cx, 0), var(--cy, 0)) scale(1); opacity: 0; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes flyBetween {
+  0% { transform: translate(var(--fly-from-dx), var(--fly-from-dy)) scale(var(--fly-from-scale)) rotate(0deg); opacity: 0.95; }
+  100% { transform: translate(0, 0) scale(1) rotate(var(--fly-rot, 3deg)); opacity: 1; }
+}
+
+.animate-fly-in {
+  animation: flyIn 0.4s ease-out forwards;
+}
+
+.animate-pop {
+  animation: pop 0.4s ease-out;
+}
+
+.animate-discard-fly {
+  animation: flyIn 0.35s ease-out;
+}
+
+.flying-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 500;
+}
+
+.flying-card {
+  animation: flyBetween var(--fly-duration, 550ms) cubic-bezier(0.33, 0.0, 0.25, 1) forwards;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.35));
+  transform-origin: center;
+  will-change: transform;
+}
+
+.flying-card-flipper {
+  perspective: 900px;
+}
+
+.flying-card-flipper .flip-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: flipReveal var(--fly-duration, 550ms) cubic-bezier(0.33, 0.0, 0.25, 1) forwards;
+}
+
+.flying-card-flipper .flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flying-card-flipper .flip-front {
+  transform: rotateY(180deg);
+}
+
+@keyframes flipReveal {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(180deg); }
+}
+
+.card.outgoing {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.05s linear;
+}
+
+.opponent.active {
+  animation: turnRing 1.6s ease-in-out infinite;
+}
+
+.confetti {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  border-radius: 2px;
+  animation: confettiBurst 1.6s ease-out forwards;
+}
